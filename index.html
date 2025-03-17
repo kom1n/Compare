@@ -418,63 +418,94 @@
                 }
             }
             
-            // Lepší implementace scrollování pomocí touch
-            let touchStartX = {};
-            let scrollLeftStart = {};
+            // Vylepšený drag and drop pro scrollování
+            let isDown = false;
+            let startX;
+            let scrollLeftStart;
             
-            // Pro každou scrollovatelnou oblast přidáme touch event listenery
-            scrollAreas.forEach((area, index) => {
-                // Přidáme event listener pro začátek touch
-                area.addEventListener('touchstart', function(e) {
-                    // Zapneme aktivní stav pro všechny oblasti
-                    scrollAreas.forEach(a => a.classList.add('active'));
-                    
-                    // Zapamatujeme si počáteční pozici
-                    touchStartX[index] = e.touches[0].clientX;
-                    scrollLeftStart[index] = area.scrollLeft;
-                }, { passive: true });
+            function handleDragStart(e) {
+                isDown = true;
                 
-                // Přidáme event listener pro konec touch
-                area.addEventListener('touchend', function() {
-                    // Vypneme aktivní stav
-                    scrollAreas.forEach(a => a.classList.remove('active'));
-                    
-                    // Aktualizujeme stav šipek
-                    updateArrows();
+                // Zaznamenáme počáteční pozici
+                startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                scrollLeftStart = {};
+                
+                // Uložíme počáteční scrollLeft hodnoty pro všechny oblasti
+                scrollAreas.forEach((area, index) => {
+                    scrollLeftStart[index] = area.scrollLeft;
+                    area.style.cursor = 'grabbing';
+                    area.classList.add('active');
                 });
                 
-                // Přidáme event listener pro pohyb
-                area.addEventListener('touchmove', function(e) {
-                    if (!touchStartX.hasOwnProperty(index)) return;
-                    
-                    // Vypočítáme rozdíl
-                    const touchX = e.touches[0].clientX;
-                    const diff = touchStartX[index] - touchX;
-                    
-                    // Nastavíme novou pozici scrollu pro všechny oblasti
-                    scrollAreas.forEach((a, i) => {
-                        // Pokud nemáme počáteční pozici pro tuto oblast, použijeme aktuální
-                        const startScrollLeft = scrollLeftStart.hasOwnProperty(i) ? scrollLeftStart[i] : a.scrollLeft;
-                        a.scrollLeft = startScrollLeft + diff;
-                    });
-                }, { passive: true });
+                // Zabráníme výchozímu chování prohlížeče
+                if (e.type.includes('mouse')) e.preventDefault();
+            }
+            
+            function handleDragEnd() {
+                isDown = false;
                 
-                // Přidáme event listener pro synchronizaci scrollu
-                area.addEventListener('scroll', function() {
-                    // Synchronizujeme scroll v ostatních oblastech
-                    if (!area.classList.contains('active')) {
-                        const scrollLeft = area.scrollLeft;
-                        scrollAreas.forEach(a => {
-                            if (a !== area) {
-                                a.scrollLeft = scrollLeft;
-                            }
-                        });
-                        
-                        // Aktualizujeme stav šipek
+                // Obnovíme styl kurzoru
+                scrollAreas.forEach(area => {
+                    area.style.cursor = 'grab';
+                    area.classList.remove('active');
+                });
+                
+                // Aktualizujeme stav šipek
+                updateArrows();
+            }
+            
+            function handleDragMove(e) {
+                if (!isDown) return;
+                
+                // Zabráníme výchozímu chování prohlížeče (např. swipe pro navigaci zpět)
+                e.preventDefault();
+                
+                // Vypočítáme, o kolik se pohybujeme
+                const x = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                const difference = x - startX;
+                
+                // Aplikujeme posun na všechny oblasti
+                scrollAreas.forEach((area, index) => {
+                    // Přímé nastavení pozice scrollu
+                    area.scrollLeft = scrollLeftStart[index] - difference;
+                });
+            }
+            
+            // Přidáme event listenery pro myš
+            scrollAreas.forEach(area => {
+                // Nastavíme výchozí styl kurzoru
+                area.style.cursor = 'grab';
+                
+                // Myš události
+                area.addEventListener('mousedown', handleDragStart);
+                area.addEventListener('mouseleave', handleDragEnd);
+                area.addEventListener('mouseup', handleDragEnd);
+                area.addEventListener('mousemove', handleDragMove);
+                
+                // Dotykové události
+                area.addEventListener('touchstart', handleDragStart, { passive: false });
+                area.addEventListener('touchend', handleDragEnd);
+                area.addEventListener('touchcancel', handleDragEnd);
+                area.addEventListener('touchmove', handleDragMove, { passive: false });
+                
+                // Poslech na událost scroll pro aktualizaci šipek
+                area.addEventListener('scroll', () => {
+                    if (area === scrollAreas[0]) {
                         updateArrows();
                     }
                 });
             });
+            
+            // Přidáme CSS pro aktivní stav
+            const style = document.createElement('style');
+            style.textContent = `
+                .scroll-area.active {
+                    cursor: grabbing;
+                    user-select: none;
+                    scroll-behavior: auto;
+                }
+            `;
+            document.head.appendChild(style);
             
             // Počáteční kontrola viditelnosti šipek
             updateArrows();
