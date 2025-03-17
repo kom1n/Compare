@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Porovnání produktů</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            width: 375px;
+            height: 812px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .comparison-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #222;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-icon {
+            color: white;
+            cursor: pointer;
+        }
+
+        .category-row {
+            display: block;
+            width: 100%;
+            clear: both;
+        }
+
+        .category-header {
+            font-weight: bold;
+            padding: 15px 10px;
+            border-bottom: 1px solid #eee;
+            background-color: #f8f8f8;
+            width: 100%;
+            display: block;
+        }
+
+        .parameter-row {
+            display: block;
+            width: 100%;
+        }
+
+        h5.parameter-label {
+            padding: 12px 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+            background-color: white;
+            display: block;
+            width: 100%;
+        }
+
+        .scroll-area {
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none; /* Firefox */
+            width: 100%;
+        }
+
+        .scroll-area::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .products-header {
+            display: flex;
+            width: max-content;
+        }
+
+        .product-column {
+            width: 160px;
+            flex-shrink: 0;
+            border-right: 1px solid #eee;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .product-name {
+            text-align: center;
+            padding: 5px;
+            font-weight: bold;
+        }
+
+        .product-size {
+            text-align: center;
+            padding: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .add-to-cart {
+            margin: 10px;
+            padding: 8px;
+            background-color: #222;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .values-row {
+            display: flex;
+            width: max-content;
+        }
+
+        .parameter-value {
+            width: 160px;
+            flex-shrink: 0;
+            padding: 12px 10px;
+            font-size: 14px;
+            border-bottom: 1px solid #eee;
+            border-right: 1px solid #eee;
+        }
+
+        .scroll-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 5;
+            border-radius: 50%;
+        }
+
+        .scroll-left {
+            left: 10px;
+        }
+
+        .scroll-right {
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="comparison-container">
+        <div class="header">
+            <div class="logo">SPORTISIMO</div>
+            <div class="nav-icons">
+                <div class="nav-icon">❤️</div>
+                <div class="nav-icon">👤</div>
+                <div class="nav-icon">🛒</div>
+                <div class="nav-icon">☰</div>
+            </div>
+        </div>
+
+        <!-- Produkty -->
+        <div class="scroll-area" id="productsScroll">
+            <div class="products-header">
+                <div class="product-column">
+                    <div class="product-image">
+                        <img src="/api/placeholder/120/100" alt="Head NX LGCY">
+                    </div>
+                    <div class="product-name">Head NX LGCY</div>
+                    <div class="product-size">Vázání, 42 EU</div>
+                    <div class="add-to-cart">Vložit do košíku</div>
+                </div>
+                <div class="product-column">
+                    <div class="product-image">
+                        <img src="/api/placeholder/120/100" alt="Head NX LGCY">
+                    </div>
+                    <div class="product-name">Head NX LGCY</div>
+                    <div class="product-size">Vázání, 42 EU</div>
+                    <div class="add-to-cart">Vložit do košíku</div>
+                </div>
+                <div class="product-column">
+                    <div class="product-image">
+                        <img src="/api/placeholder/120/100" alt="Head NX LGCY">
+                    </div>
+                    <div class="product-name">Head NX LGCY</div>
+                    <div class="product-size">Vázání, 42 EU</div>
+                    <div class="add-to-cart">Vložit do košíku</div>
+                </div>
+                <div class="product-column">
+                    <div class="product-image">
+                        <img src="/api/placeholder/120/100" alt="Head NX LGCY">
+                    </div>
+                    <div class="product-name">Head NX LGCY</div>
+                    <div class="product-size">Vázání, 42 EU</div>
+                    <div class="add-to-cart">Vložit do košíku</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Obecné parametry -->
+        <div class="category-row">
+            <div class="category-header">Obecné parametry</div>
+        </div>
+
+        <!-- Svršek -->
+        <div class="parameter-row">
+            <h5 class="parameter-label">Svršek</h5>
+            <div class="scroll-area">
+                <div class="values-row">
+                    <div class="parameter-value">Textilie</div>
+                    <div class="parameter-value">Psí srst</div>
+                    <div class="parameter-value">Textilie</div>
+                    <div class="parameter-value">Psí srst</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kategorie -->
+        <div class="parameter-row">
+            <h5 class="parameter-label">Kategorie</h5>
+            <div class="scroll-area">
+                <div class="values-row">
+                    <div class="parameter-value">Charged Cushioning</div>
+                    <div class="parameter-value">Charged Cushioning</div>
+                    <div class="parameter-value">Charged Cushioning</div>
+                    <div class="parameter-value">Charged Cushioning</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Podrážka -->
+        <div class="parameter-row">
+            <h5 class="parameter-label">Podrážka</h5>
+            <div class="scroll-area">
+                <div class="values-row">
+                    <div class="parameter-value">Guma</div>
+                    <div class="parameter-value">Kůže</div>
+                    <div class="parameter-value">Guma</div>
+                    <div class="parameter-value">Kůže</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Povrch -->
+        <div class="parameter-row">
+            <h5 class="parameter-label">Povrch</h5>
+            <div class="scroll-area">
+                <div class="values-row">
+                    <div class="parameter-value">Silnice, tvrdý povrch</div>
+                    <div class="parameter-value">Půlnáčka, měkký povrch</div>
+                    <div class="parameter-value">Silnice, tvrdý povrch</div>
+                    <div class="parameter-value">Půlnáčka, měkký povrch</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barva -->
+        <div class="parameter-row">
+            <h5 class="parameter-label">Barva</h5>
+            <div class="scroll-area">
+                <div class="values-row">
+                    <div class="parameter-value">Modrá, žlutá, zelená</div>
+                    <div class="parameter-value">Modrá, žlutá, zelená</div>
+                    <div class="parameter-value">Modrá, žlutá, zelená</div>
+                    <div class="parameter-value">Modrá, žlutá, zelená</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technologie -->
+        <div class="category-row">
+            <div class="category-header">Technologie</div>
+        </div>
+
+        <!-- Svršek -->
+        <div class="parameter-row">
+            <h5 class="parameter-label">Svršek</h5>
+            <div class="scroll-area">
+                <div class="values-row">
+                    <div class="parameter-value">Textilie</div>
+                    <div class="parameter-value">Psí srst</div>
+                    <div class="parameter-value">Textilie</div>
+                    <div class="parameter-value">Psí srst</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kategorie -->
+        <div class="parameter-row">
+            <h5 class="parameter-label">Kategorie</h5>
+            <div class="scroll-area">
+                <div class="values-row">
+                    <div class="parameter-value">Charged Cushioning</div>
+                    <div class="parameter-value">Charged Cushioning</div>
+                    <div class="parameter-value">Charged Cushioning</div>
+                    <div class="parameter-value">Charged Cushioning</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Podrážka -->
+        <div class="parameter-row">
+            <h5 class="parameter-label">Podrážka</h5>
+            <div class="scroll-area">
+                <div class="values-row">
+                    <div class="parameter-value">Guma</div>
+                    <div class="parameter-value">Kůže</div>
+                    <div class="parameter-value">Guma</div>
+                    <div class="parameter-value">Kůže</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scroll-arrow scroll-left">◀</div>
+        <div class="scroll-arrow scroll-right">▶</div>
+    </div>
+
+    <script>
+        // Počkejme, až se dokument načte
+        document.addEventListener('DOMContentLoaded', function() {
+            const scrollAreas = document.querySelectorAll('.scroll-area');
+            const productWidth = 160; // Šířka sloupce produktu
+            
+            // Funkce pro posuv doleva
+            window.scrollLeft = function() {
+                scrollAreas.forEach(area => {
+                    area.scrollBy({
+                        left: -productWidth,
+                        behavior: 'smooth'
+                    });
+                });
+            };
+            
+            // Funkce pro posuv doprava
+            window.scrollRight = function() {
+                scrollAreas.forEach(area => {
+                    area.scrollBy({
+                        left: productWidth,
+                        behavior: 'smooth'
+                    });
+                });
+            };
+            
+            // Přidání event listenerů na šipky
+            document.querySelector('.scroll-left').addEventListener('click', window.scrollLeft);
+            document.querySelector('.scroll-right').addEventListener('click', window.scrollRight);
+        });
+    </script>
+</body>
+</html>
