@@ -87,31 +87,26 @@
 
         .scroll-area {
             overflow-x: auto;
-            scroll-behavior: smooth;
             scrollbar-width: none; /* Firefox */
             width: 100%;
             -webkit-overflow-scrolling: touch; /* Plynulý scroll na iOS */
-            user-select: none; /* Zabrání označování textu při dragování */
-        }
-        
-        /* Pro deaktivaci plynulého scrollování během drag & drop */
-        .scroll-area.active {
-            scroll-behavior: auto;
+            white-space: nowrap; /* Důležité pro horizontální scrollování */
         }
 
         .scroll-area::-webkit-scrollbar {
             display: none; /* Chrome, Safari, Opera */
         }
 
-        .products-header {
-            display: flex;
-            width: max-content;
+        .product-wrapper {
+            white-space: nowrap;
         }
 
         .product-column {
             width: 160px;
-            flex-shrink: 0;
+            display: inline-block;
+            vertical-align: top;
             border-right: 1px solid #eee;
+            white-space: normal; /* Reset bílého prostoru uvnitř produktu */
         }
 
         .product-image {
@@ -152,18 +147,19 @@
             border-radius: 3px;
         }
 
-        .values-row {
-            display: flex;
-            width: max-content;
+        .values-wrapper {
+            white-space: nowrap;
         }
 
         .parameter-value {
             width: 160px;
-            flex-shrink: 0;
+            display: inline-block;
+            vertical-align: top;
             padding: 12px 10px;
             font-size: 14px;
             border-bottom: 1px solid #eee;
             border-right: 1px solid #eee;
+            white-space: normal; /* Reset bílého prostoru uvnitř hodnoty */
         }
 
         .scroll-arrow {
@@ -206,7 +202,7 @@
 
         <!-- Produkty -->
         <div class="scroll-area" id="productsScroll">
-            <div class="products-header">
+            <div class="product-wrapper">
                 <div class="product-column">
                     <div class="product-image">
                         <img src="/api/placeholder/120/100" alt="Head NX LGCY">
@@ -250,8 +246,8 @@
         <!-- Svršek -->
         <div class="parameter-row">
             <h5 class="parameter-label">Svršek</h5>
-            <div class="scroll-area">
-                <div class="values-row">
+            <div class="scroll-area parameter-scroll">
+                <div class="values-wrapper">
                     <div class="parameter-value">Textilie</div>
                     <div class="parameter-value">Psí srst</div>
                     <div class="parameter-value">Textilie</div>
@@ -263,8 +259,8 @@
         <!-- Kategorie -->
         <div class="parameter-row">
             <h5 class="parameter-label">Kategorie</h5>
-            <div class="scroll-area">
-                <div class="values-row">
+            <div class="scroll-area parameter-scroll">
+                <div class="values-wrapper">
                     <div class="parameter-value">Charged Cushioning</div>
                     <div class="parameter-value">Charged Cushioning</div>
                     <div class="parameter-value">Charged Cushioning</div>
@@ -276,8 +272,8 @@
         <!-- Podrážka -->
         <div class="parameter-row">
             <h5 class="parameter-label">Podrážka</h5>
-            <div class="scroll-area">
-                <div class="values-row">
+            <div class="scroll-area parameter-scroll">
+                <div class="values-wrapper">
                     <div class="parameter-value">Guma</div>
                     <div class="parameter-value">Kůže</div>
                     <div class="parameter-value">Guma</div>
@@ -289,8 +285,8 @@
         <!-- Povrch -->
         <div class="parameter-row">
             <h5 class="parameter-label">Povrch</h5>
-            <div class="scroll-area">
-                <div class="values-row">
+            <div class="scroll-area parameter-scroll">
+                <div class="values-wrapper">
                     <div class="parameter-value">Silnice, tvrdý povrch</div>
                     <div class="parameter-value">Půlnáčka, měkký povrch</div>
                     <div class="parameter-value">Silnice, tvrdý povrch</div>
@@ -302,8 +298,8 @@
         <!-- Barva -->
         <div class="parameter-row">
             <h5 class="parameter-label">Barva</h5>
-            <div class="scroll-area">
-                <div class="values-row">
+            <div class="scroll-area parameter-scroll">
+                <div class="values-wrapper">
                     <div class="parameter-value">Modrá, žlutá, zelená</div>
                     <div class="parameter-value">Modrá, žlutá, zelená</div>
                     <div class="parameter-value">Modrá, žlutá, zelená</div>
@@ -320,8 +316,8 @@
         <!-- Svršek -->
         <div class="parameter-row">
             <h5 class="parameter-label">Svršek</h5>
-            <div class="scroll-area">
-                <div class="values-row">
+            <div class="scroll-area parameter-scroll">
+                <div class="values-wrapper">
                     <div class="parameter-value">Textilie</div>
                     <div class="parameter-value">Psí srst</div>
                     <div class="parameter-value">Textilie</div>
@@ -333,8 +329,8 @@
         <!-- Kategorie -->
         <div class="parameter-row">
             <h5 class="parameter-label">Kategorie</h5>
-            <div class="scroll-area">
-                <div class="values-row">
+            <div class="scroll-area parameter-scroll">
+                <div class="values-wrapper">
                     <div class="parameter-value">Charged Cushioning</div>
                     <div class="parameter-value">Charged Cushioning</div>
                     <div class="parameter-value">Charged Cushioning</div>
@@ -346,8 +342,8 @@
         <!-- Podrážka -->
         <div class="parameter-row">
             <h5 class="parameter-label">Podrážka</h5>
-            <div class="scroll-area">
-                <div class="values-row">
+            <div class="scroll-area parameter-scroll">
+                <div class="values-wrapper">
                     <div class="parameter-value">Guma</div>
                     <div class="parameter-value">Kůže</div>
                     <div class="parameter-value">Guma</div>
@@ -398,6 +394,26 @@
             leftArrow.addEventListener('click', window.scrollLeft);
             rightArrow.addEventListener('click', window.scrollRight);
             
+            // Synchronizace scrollování mezi oblastmi
+            function syncScroll(sourceArea) {
+                const scrollLeft = sourceArea.scrollLeft;
+                
+                scrollAreas.forEach(area => {
+                    if (area !== sourceArea) {
+                        area.scrollLeft = scrollLeft;
+                    }
+                });
+                
+                updateArrows();
+            }
+            
+            // Přidáme synchronizaci scrollování
+            scrollAreas.forEach(area => {
+                area.addEventListener('scroll', function() {
+                    syncScroll(area);
+                });
+            });
+            
             // Funkce pro aktualizaci viditelnosti šipek
             function updateArrows() {
                 // Bereme první scrollovatelnou oblast jako referenci
@@ -417,95 +433,6 @@
                     rightArrow.style.opacity = '1';
                 }
             }
-            
-            // Vylepšený drag and drop pro scrollování
-            let isDown = false;
-            let startX;
-            let scrollLeftStart;
-            
-            function handleDragStart(e) {
-                isDown = true;
-                
-                // Zaznamenáme počáteční pozici
-                startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
-                scrollLeftStart = {};
-                
-                // Uložíme počáteční scrollLeft hodnoty pro všechny oblasti
-                scrollAreas.forEach((area, index) => {
-                    scrollLeftStart[index] = area.scrollLeft;
-                    area.style.cursor = 'grabbing';
-                    area.classList.add('active');
-                });
-                
-                // Zabráníme výchozímu chování prohlížeče
-                if (e.type.includes('mouse')) e.preventDefault();
-            }
-            
-            function handleDragEnd() {
-                isDown = false;
-                
-                // Obnovíme styl kurzoru
-                scrollAreas.forEach(area => {
-                    area.style.cursor = 'grab';
-                    area.classList.remove('active');
-                });
-                
-                // Aktualizujeme stav šipek
-                updateArrows();
-            }
-            
-            function handleDragMove(e) {
-                if (!isDown) return;
-                
-                // Zabráníme výchozímu chování prohlížeče (např. swipe pro navigaci zpět)
-                e.preventDefault();
-                
-                // Vypočítáme, o kolik se pohybujeme
-                const x = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
-                const difference = x - startX;
-                
-                // Aplikujeme posun na všechny oblasti
-                scrollAreas.forEach((area, index) => {
-                    // Přímé nastavení pozice scrollu
-                    area.scrollLeft = scrollLeftStart[index] - difference;
-                });
-            }
-            
-            // Přidáme event listenery pro myš
-            scrollAreas.forEach(area => {
-                // Nastavíme výchozí styl kurzoru
-                area.style.cursor = 'grab';
-                
-                // Myš události
-                area.addEventListener('mousedown', handleDragStart);
-                area.addEventListener('mouseleave', handleDragEnd);
-                area.addEventListener('mouseup', handleDragEnd);
-                area.addEventListener('mousemove', handleDragMove);
-                
-                // Dotykové události
-                area.addEventListener('touchstart', handleDragStart, { passive: false });
-                area.addEventListener('touchend', handleDragEnd);
-                area.addEventListener('touchcancel', handleDragEnd);
-                area.addEventListener('touchmove', handleDragMove, { passive: false });
-                
-                // Poslech na událost scroll pro aktualizaci šipek
-                area.addEventListener('scroll', () => {
-                    if (area === scrollAreas[0]) {
-                        updateArrows();
-                    }
-                });
-            });
-            
-            // Přidáme CSS pro aktivní stav
-            const style = document.createElement('style');
-            style.textContent = `
-                .scroll-area.active {
-                    cursor: grabbing;
-                    user-select: none;
-                    scroll-behavior: auto;
-                }
-            `;
-            document.head.appendChild(style);
             
             // Počáteční kontrola viditelnosti šipek
             updateArrows();
