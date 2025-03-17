@@ -367,6 +367,7 @@
             const productWidth = 160; // Šířka sloupce produktu
             const leftArrow = document.querySelector('.scroll-left');
             const rightArrow = document.querySelector('.scroll-right');
+            const container = document.querySelector('.comparison-container');
             
             // Funkce pro posuv doleva
             window.scrollLeft = function() {
@@ -421,14 +422,21 @@
             // Vylepšený drag and drop pro scrollování
             let isDown = false;
             let startX;
+            let startY;
             let scrollLeftStart;
+            let initialScrollTop;
+            let isHorizontalDrag = null;
             
             function handleDragStart(e) {
                 isDown = true;
                 
-                // Zaznamenáme počáteční pozici
+                // Zaznamenáme počáteční pozici (X i Y)
                 startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                startY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
+                
+                // Zapamatujeme si počáteční horizontální i vertikální scroll
                 scrollLeftStart = {};
+                initialScrollTop = container.scrollTop;
                 
                 // Uložíme počáteční scrollLeft hodnoty pro všechny oblasti
                 scrollAreas.forEach((area, index) => {
@@ -437,18 +445,25 @@
                     area.classList.add('active');
                 });
                 
+                // Resetujeme směr tažení při začátku
+                isHorizontalDrag = null;
+                
                 // Zabráníme výchozímu chování prohlížeče
                 if (e.type.includes('mouse')) e.preventDefault();
             }
             
             function handleDragEnd() {
                 isDown = false;
+                isHorizontalDrag = null;
                 
                 // Obnovíme styl kurzoru
                 scrollAreas.forEach(area => {
                     area.style.cursor = 'grab';
                     area.classList.remove('active');
                 });
+                
+                // Obnovíme overflow na container
+                container.style.overflowY = 'auto';
                 
                 // Aktualizujeme stav šipek
                 updateArrows();
@@ -457,18 +472,43 @@
             function handleDragMove(e) {
                 if (!isDown) return;
                 
-                // Zabráníme výchozímu chování prohlížeče (např. swipe pro navigaci zpět)
-                e.preventDefault();
-                
-                // Vypočítáme, o kolik se pohybujeme
+                // Získáme aktuální pozice
                 const x = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
-                const difference = x - startX;
+                const y = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
                 
-                // Aplikujeme posun na všechny oblasti
-                scrollAreas.forEach((area, index) => {
-                    // Přímé nastavení pozice scrollu
-                    area.scrollLeft = scrollLeftStart[index] - difference;
-                });
+                // Vypočítáme rozdíly
+                const diffX = x - startX;
+                const diffY = y - startY;
+                const absX = Math.abs(diffX);
+                const absY = Math.abs(diffY);
+                
+                // Při prvním pohybu určíme, zda jde o horizontální nebo vertikální tažení
+                // Určíme prioritní směr pouze pokud ještě nebyl určen
+                if (isHorizontalDrag === null && (absX > 5 || absY > 5)) {
+                    isHorizontalDrag = absX > absY;
+                    
+                    // Pokud jde o horizontální tažení, zakážeme vertikální scroll
+                    if (isHorizontalDrag) {
+                        container.style.overflowY = 'hidden';
+                        e.preventDefault();
+                    }
+                }
+                
+                // Pokud je to horizontální tažení, posuneme horizontálně
+                if (isHorizontalDrag) {
+                    // Zabráníme výchozímu chování prohlížeče
+                    e.preventDefault();
+                    
+                    // Aplikujeme posun na všechny oblasti
+                    scrollAreas.forEach((area, index) => {
+                        // Přímé nastavení pozice scrollu
+                        area.scrollLeft = scrollLeftStart[index] - diffX;
+                    });
+                } 
+                // Pokud je to vertikální tažení, necháme nativní scroll
+                else if (isHorizontalDrag === false) {
+                    // Neděláme nic, necháme nativní vertikální scroll fungovat
+                }
             }
             
             // Přidáme event listenery pro myš
@@ -483,7 +523,7 @@
                 area.addEventListener('mousemove', handleDragMove);
                 
                 // Dotykové události
-                area.addEventListener('touchstart', handleDragStart, { passive: false });
+                area.addEventListener('touchstart', handleDragStart, { passive: true });
                 area.addEventListener('touchend', handleDragEnd);
                 area.addEventListener('touchcancel', handleDragEnd);
                 area.addEventListener('touchmove', handleDragMove, { passive: false });
@@ -503,6 +543,11 @@
                     cursor: grabbing;
                     user-select: none;
                     scroll-behavior: auto;
+                }
+                
+                /* Pomocná třída pro zablokování vertikálního scrollu */
+                .vertical-scroll-lock {
+                    overflow-y: hidden !important;
                 }
             `;
             document.head.appendChild(style);
